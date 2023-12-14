@@ -2,6 +2,7 @@ package com.example.security.service;
 
 import com.example.security.dto.CreateNoteDto;
 import com.example.security.dto.NoteDto;
+import com.example.security.dto.ShareNoteDto;
 import com.example.security.dto.UpdateNoteDto;
 import com.example.security.model.User;
 
@@ -14,6 +15,8 @@ public interface NoteUseCases {
 
     List<NoteDto> getAllPublicNotes(User user);
 
+    List<NoteDto> getAllSharedNotes(User user);
+
     NoteDto getNoteToRead(UUID id, User user);
 
     NoteDto getNoteToEdit(UUID id, User user);
@@ -23,5 +26,7 @@ public interface NoteUseCases {
     void updateNote(UUID id, UpdateNoteDto updateNoteDto, User user);
 
     void deleteNote(UUID id, User user);
+
+    void shareNote(UUID id, ShareNoteDto shareNoteDto, User user);
 
 }

@@ -1,5 +1,6 @@
 package com.example.security.dto;
 
+import java.util.Set;
 import java.util.UUID;
 
 public record NoteDto(
@@ -7,7 +8,8 @@ public record NoteDto(
         String title,
         String content,
         Boolean isPublic,
-        String author
+        String author,
+        Set<String> readers
 ) {
 
 }

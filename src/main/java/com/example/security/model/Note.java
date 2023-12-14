@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.lang.NonNull;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -36,6 +38,12 @@ public class Note {
     @ToString.Exclude
     @Setter(AccessLevel.NONE)
     private User author;
+
+    @ManyToMany
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    @Setter(AccessLevel.NONE)
+    private Set<User> readers = new HashSet<>();
 
     public Note(@NonNull String title, @NonNull String content, @NonNull User author, @NonNull Boolean isPublic) {
         this.title = title;

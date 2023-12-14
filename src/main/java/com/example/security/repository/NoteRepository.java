@@ -19,7 +19,9 @@ public interface NoteRepository extends JpaRepository<Note, UUID> {
 
     List<Note> findAllByIsPublicIsTrue();
 
-    @Query("SELECT note FROM Note note WHERE note.id = :id AND (note.author = :author OR note.isPublic = true)")
-    Optional<Note> findByIdAndAuthorOrIsPublicIsTrue(UUID id, User author);
+    List<Note> findAllByReadersContains(User reader);
+
+    @Query("SELECT note FROM Note note WHERE note.id = :id AND (note.author = :author OR :author MEMBER OF note.readers OR note.isPublic = true)")
+    Optional<Note> findNoteWithReadAccess(UUID id, User author);
 
 }

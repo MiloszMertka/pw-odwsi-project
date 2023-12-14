@@ -45,13 +45,28 @@ class NoteSeeder implements Seeder {
         final var content = faker.lorem().paragraph();
         final var author = findRandomUser();
         final var isPublic = faker.bool().bool();
-        return new Note(title, content, author, isPublic);
+        final var note = new Note(title, content, author, isPublic);
+        final var totalUsersCount = Math.toIntExact(userRepository.count());
+        final var users = findRandomUsers(faker.random().nextInt(totalUsersCount));
+        note.getReaders().addAll(users);
+        return note;
     }
 
     private User findRandomUser() {
         final var users = userRepository.findAll();
         final var randomIndex = faker.random().nextInt(users.size());
         return users.get(randomIndex);
+    }
+
+    private Set<User> findRandomUsers(int usersNumber) {
+        final var users = userRepository.findAll();
+        final Set<User> randomUsers = HashSet.newHashSet(usersNumber);
+        while (randomUsers.size() < usersNumber) {
+            final var randomIndex = faker.random().nextInt(users.size());
+            randomUsers.add(users.get(randomIndex));
+        }
+
+        return randomUsers;
     }
 
 }
