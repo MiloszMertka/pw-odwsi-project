@@ -14,14 +14,12 @@ import org.owasp.html.Sanitizers;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 class NoteService implements NoteUseCases {
 
-    private static final String NOTE_NOT_FOUND_MESSAGE = "Note does not exist";
     private static final String USER_NOT_AUTHORIZED_MESSAGE = "User is not authorized to perform this action";
     private final NoteRepository noteRepository;
 
@@ -34,9 +32,8 @@ class NoteService implements NoteUseCases {
 
     @Override
     public NoteDto getNote(@NonNull UUID id, @NonNull User user) {
-        return noteRepository.findByIdAndAuthor(id, user)
-                .map(this::mapNoteToNoteDto)
-                .orElseThrow(() -> new NoSuchElementException(NOTE_NOT_FOUND_MESSAGE));
+        final var note = noteRepository.findByIdAndAuthor(id, user).orElseThrow();
+        return mapNoteToNoteDto(note);
     }
 
     @Override
@@ -48,8 +45,7 @@ class NoteService implements NoteUseCases {
 
     @Override
     public void updateNote(@NonNull UUID id, @NonNull UpdateNoteDto updateNoteDto, @NonNull User user) {
-        final var note = noteRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException(NOTE_NOT_FOUND_MESSAGE));
+        final var note = noteRepository.findById(id).orElseThrow();
         validateUserIsNoteAuthor(user, note);
         final var sanitizedContent = sanitizeHtmlContent(updateNoteDto.content());
         note.setTitle(updateNoteDto.title());
@@ -59,8 +55,7 @@ class NoteService implements NoteUseCases {
 
     @Override
     public void deleteNote(@NonNull UUID id, @NonNull User user) {
-        final var note = noteRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException(NOTE_NOT_FOUND_MESSAGE));
+        final var note = noteRepository.findById(id).orElseThrow();
         validateUserIsNoteAuthor(user, note);
         noteRepository.delete(note);
     }

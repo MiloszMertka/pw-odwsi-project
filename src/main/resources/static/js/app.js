@@ -27,6 +27,10 @@ var quill = new Quill('#editor', {
 var content = document.getElementById('content');
 var form = document.getElementsByTagName('form')[0];
 form.onsubmit = function () {
+    if (content === null) {
+        return true;
+    }
+
     content.value = quill.root.innerHTML;
     return true;
 };

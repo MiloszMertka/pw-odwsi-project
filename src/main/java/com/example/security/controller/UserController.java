@@ -10,7 +10,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -18,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/users")
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 class UserController {
-    
+
     private final UserUseCases userUseCases;
 
     @GetMapping("/login")
@@ -34,12 +33,18 @@ class UserController {
     }
 
     @PostMapping("/register")
-    String registerUser(@ModelAttribute @Valid RegisterUserDto registerUserDto, BindingResult bindingResult) {
+    String registerUser(@Valid RegisterUserDto registerUserDto, BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
             return "register";
         }
 
-        userUseCases.registerUser(registerUserDto);
+        try {
+            userUseCases.registerUser(registerUserDto);
+        } catch (IllegalStateException exception) {
+            model.addAttribute("error", exception.getMessage());
+            return "register";
+        }
+
         return "redirect:/users/login";
     }
 

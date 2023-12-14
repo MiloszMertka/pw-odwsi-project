@@ -4,8 +4,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 public record UpdateNoteDto(
-        @NotBlank @Size(max = 255) String title,
-        @NotBlank @Size(max = 5000) String content
+        @NotBlank(message = "Title cannot be blank") @Size(max = 255, message = "Title must not have more than 255 characters") String title,
+        @NotBlank(message = "Content cannot be blank") @Size(max = 5000, message = "Content must not have more than 5000 characters") String content
 ) {
 
 }

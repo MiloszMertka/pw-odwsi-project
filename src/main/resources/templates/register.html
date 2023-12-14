@@ -9,34 +9,41 @@
 <body>
 <main class="container d-flex flex-column align-items-center justify-content-center mt-5">
     <h1 class="mb-4">Register</h1>
-    <form action="#" class="row g-3 needs-validation" method="post" novalidate
-          th:action="@{/users/register}" th:classappend="${#fields.hasAnyErrors() ? 'was-validated' : ''}"
+    <form action="#" class="row g-3" method="post" th:action="@{/users/register}"
           th:object="${registerUserDto}">
         <input th:name="${_csrf.parameterName}" th:value="${_csrf.token}" type="hidden"/>
         <div class="col-12">
             <label class="form-label" for="username">Username</label>
-            <input class="form-control" id="username" name="username" required th:field="*{username}" type="text"/>
+            <input class="form-control" id="username" name="username"
+                   th:classappend="${#fields.hasErrors('username') ? 'is-invalid' : ''}"
+                   th:field="*{username}"
+                   type="text"/>
             <div class="invalid-feedback" th:if="${#fields.hasErrors('username')}"
-                 th:text="${#fields.errors('username')}"></div>
+                 th:text="${#fields.errors('username').getFirst()}"></div>
         </div>
         <div class="col-12">
             <label class="form-label" for="password">Password</label>
-            <input class="form-control" id="password" name="password" required th:field="*{password}" type="password"/>
+            <input class="form-control" id="password" name="password"
+                   th:classappend="${#fields.hasErrors('password') ? 'is-invalid' : ''}"
+                   th:field="*{password}"
+                   type="password"/>
             <div class="invalid-feedback" th:if="${#fields.hasErrors('password')}"
-                 th:text="${#fields.errors('password')}"></div>
+                 th:text="${#fields.errors('password').getFirst()}"></div>
         </div>
         <div class="col-12">
             <label class="form-label" for="password-confirmation">Password Confirmation</label>
-            <input class="form-control" id="password-confirmation" name="password-confirmation" required
+            <input class="form-control" id="password-confirmation" name="password-confirmation"
+                   th:classappend="${#fields.hasErrors('passwordConfirmation') ? 'is-invalid' : ''}"
                    th:field="*{passwordConfirmation}"
                    type="password"/>
             <div class="invalid-feedback" th:if="${#fields.hasErrors('passwordConfirmation')}"
-                 th:text="${#fields.errors('passwordConfirmation')}"></div>
+                 th:text="${#fields.errors('passwordConfirmation').getFirst()}"></div>
         </div>
         <div class="col-12 d-flex justify-content-end">
             <a class="btn btn-secondary me-1" th:href="@{/users/login}">Login</a>
             <button class="btn btn-primary" type="submit">Register</button>
         </div>
+        <div class="alert alert-danger" role="alert" th:if="${error}" th:text="${error}"></div>
     </form>
 </main>
 <script th:src="@{/js/bootstrap.bundle.min.js}" type="text/javascript"></script>

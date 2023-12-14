@@ -9,22 +9,25 @@
 <body>
 <main class="container d-flex flex-column align-items-center justify-content-center mt-5">
     <h1 class="mb-4">Login</h1>
-    <form action="#" class="row g-3 needs-validation" method="post" novalidate
-          th:action="@{/users/login}" th:classappend="${param.error != null ? 'was-validated' : ''}"
+    <form action="#" class="row g-3" method="post" th:action="@{/users/login}"
           th:object="${loginUserDto}">
         <input th:name="${_csrf.parameterName}" th:value="${_csrf.token}" type="hidden"/>
         <div class="col-12">
             <label class="form-label" for="username">Username</label>
-            <input class="form-control" id="username" name="username" required th:field="*{username}" type="text"/>
-            <div class="invalid-feedback" th:if="param.error != null">
-                Invalid credentials.
+            <input class="form-control" id="username" name="username"
+                   th:classappend="${param.error != null ? 'is-invalid' : ''}" th:field="*{username}"
+                   type="text"/>
+            <div class="invalid-feedback" th:if="${param.error != null}">
+                Invalid credentials
             </div>
         </div>
         <div class="col-12">
             <label class="form-label" for="password">Password</label>
-            <input class="form-control" id="password" name="password" required th:field="*{password}" type="password"/>
-            <div class="invalid-feedback" th:if="param.error != null">
-                Invalid credentials.
+            <input class="form-control" id="password" name="password"
+                   th:classappend="${param.error != null ? 'is-invalid' : ''}" th:field="*{password}"
+                   type="password"/>
+            <div class="invalid-feedback" th:if="${param.error != null}">
+                Invalid credentials
             </div>
         </div>
         <div class="col-12 d-flex justify-content-end">
