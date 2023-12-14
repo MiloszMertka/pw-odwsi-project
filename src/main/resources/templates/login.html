@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta content="width=device-width, initial-scale=1" name="viewport"/>
+    <title>Notes Secure App | Login</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" type="text/css"/>
+</head>
+<body>
+<main class="container d-flex flex-column align-items-center justify-content-center mt-5">
+    <h1 class="mb-4">Login</h1>
+    <form action="#" class="row g-3 needs-validation" method="post" novalidate
+          th:action="@{/users/login}" th:classappend="${param.error != null ? 'was-validated' : ''}"
+          th:object="${loginUserDto}">
+        <input th:name="${_csrf.parameterName}" th:value="${_csrf.token}" type="hidden"/>
+        <div class="col-12">
+            <label class="form-label" for="username">Username</label>
+            <input class="form-control" id="username" name="username" required th:field="*{username}" type="text"/>
+            <div class="invalid-feedback" th:if="param.error != null">
+                Invalid credentials.
+            </div>
+        </div>
+        <div class="col-12">
+            <label class="form-label" for="password">Password</label>
+            <input class="form-control" id="password" name="password" required th:field="*{password}" type="password"/>
+            <div class="invalid-feedback" th:if="param.error != null">
+                Invalid credentials.
+            </div>
+        </div>
+        <div class="col-12 d-flex justify-content-end">
+            <a class="btn btn-secondary me-1" th:href="@{/users/register}">Register</a>
+            <button class="btn btn-primary" type="submit">Login</button>
+        </div>
+    </form>
+</main>
+<script th:src="@{/js/bootstrap.bundle.min.js}" type="text/javascript"></script>
+</body>
+</html>
