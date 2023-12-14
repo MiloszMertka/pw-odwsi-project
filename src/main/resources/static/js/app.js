@@ -25,7 +25,7 @@ var quill = new Quill('#editor', {
 });
 
 var content = document.getElementById('content');
-var form = document.getElementsByTagName('form')[0];
+var form = document.getElementById('resource-form');
 form.onsubmit = function () {
     if (content === null) {
         return true;

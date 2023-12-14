@@ -27,21 +27,23 @@ class NoteController {
 
     @GetMapping
     String showNotesPage(Model model, @AuthenticationPrincipal User user) {
-        final var notes = noteUseCases.getAllUserNotes(user);
-        model.addAttribute("notes", notes);
+        final var userNotes = noteUseCases.getAllUserNotes(user);
+        final var publicNotes = noteUseCases.getAllPublicNotes(user);
+        model.addAttribute("userNotes", userNotes);
+        model.addAttribute("publicNotes", publicNotes);
         return "notes";
     }
 
     @GetMapping("/read/{id}")
     String showNotePage(@PathVariable UUID id, Model model, @AuthenticationPrincipal User user) {
-        final var note = noteUseCases.getNote(id, user);
+        final var note = noteUseCases.getNoteToRead(id, user);
         model.addAttribute("note", note);
         return "note";
     }
 
     @GetMapping("/create")
     String showCreateNoteForm(Model model) {
-        model.addAttribute("createNoteDto", new CreateNoteDto("", ""));
+        model.addAttribute("createNoteDto", new CreateNoteDto("", "", false));
         return "create-note-form";
     }
 
@@ -63,8 +65,8 @@ class NoteController {
 
     @GetMapping("/edit/{id}")
     String showEditNoteForm(@PathVariable UUID id, Model model, @AuthenticationPrincipal User user) {
-        final var note = noteUseCases.getNote(id, user);
-        model.addAttribute("updateNoteDto", new UpdateNoteDto(note.title(), note.content()));
+        final var note = noteUseCases.getNoteToEdit(id, user);
+        model.addAttribute("updateNoteDto", new UpdateNoteDto(note.title(), note.content(), note.isPublic()));
         model.addAttribute("noteId", id);
         return "edit-note-form";
     }

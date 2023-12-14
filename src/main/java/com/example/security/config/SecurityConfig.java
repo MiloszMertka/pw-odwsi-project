@@ -26,8 +26,9 @@ class SecurityConfig {
         return httpSecurity
                 .csrf(Customizer.withDefaults())
                 .headers(headers -> headers
-                        .xssProtection(xssProtectionConfig -> xssProtectionConfig.headerValue(HeaderValue.ENABLED_MODE_BLOCK))
-                        .contentSecurityPolicy(Customizer.withDefaults()))
+                                .xssProtection(xssProtectionConfig -> xssProtectionConfig.headerValue(HeaderValue.ENABLED_MODE_BLOCK))
+//                        .contentSecurityPolicy(Customizer.withDefaults())
+                )
                 .authenticationProvider(authenticationProvider())
                 .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
                         .requestMatchers("/css/**").permitAll()

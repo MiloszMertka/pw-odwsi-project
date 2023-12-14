@@ -31,7 +31,21 @@ class NoteService implements NoteUseCases {
     }
 
     @Override
-    public NoteDto getNote(@NonNull UUID id, @NonNull User user) {
+    public List<NoteDto> getAllPublicNotes(@NonNull User user) {
+        return noteRepository.findAllByIsPublicIsTrue().stream()
+                .filter(note -> !note.getAuthor().equals(user))
+                .map(this::mapNoteToNoteDto)
+                .toList();
+    }
+
+    @Override
+    public NoteDto getNoteToRead(@NonNull UUID id, @NonNull User user) {
+        final var note = noteRepository.findByIdAndAuthorOrIsPublicIsTrue(id, user).orElseThrow();
+        return mapNoteToNoteDto(note);
+    }
+
+    @Override
+    public NoteDto getNoteToEdit(@NonNull UUID id, @NonNull User user) {
         final var note = noteRepository.findByIdAndAuthor(id, user).orElseThrow();
         return mapNoteToNoteDto(note);
     }
@@ -39,7 +53,7 @@ class NoteService implements NoteUseCases {
     @Override
     public void createNote(@NonNull CreateNoteDto createNoteDto, @NonNull User user) {
         final var sanitizedContent = sanitizeHtmlContent(createNoteDto.content());
-        final var note = new Note(createNoteDto.title(), sanitizedContent, user);
+        final var note = new Note(createNoteDto.title(), sanitizedContent, user, createNoteDto.isPublic());
         noteRepository.save(note);
     }
 
@@ -50,6 +64,7 @@ class NoteService implements NoteUseCases {
         final var sanitizedContent = sanitizeHtmlContent(updateNoteDto.content());
         note.setTitle(updateNoteDto.title());
         note.setContent(sanitizedContent);
+        note.setIsPublic(updateNoteDto.isPublic());
         noteRepository.save(note);
     }
 
@@ -61,7 +76,7 @@ class NoteService implements NoteUseCases {
     }
 
     private NoteDto mapNoteToNoteDto(Note note) {
-        return new NoteDto(note.getId(), note.getTitle(), note.getContent(), note.getAuthor().getUsername());
+        return new NoteDto(note.getId(), note.getTitle(), note.getContent(), note.getIsPublic(), note.getAuthor().getUsername());
     }
 
     private void validateUserIsNoteAuthor(User user, Note note) {

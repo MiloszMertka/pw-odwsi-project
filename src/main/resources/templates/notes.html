@@ -21,13 +21,22 @@
         <h1 class="m-0">Notes</h1>
         <a class="btn btn-primary" th:href="@{/notes/create}">Create Note</a>
     </div>
-    <div class="card my-3" th:each="note: ${notes}">
+    <h2>Your notes</h2>
+    <div class="card my-3" th:each="note: ${userNotes}">
         <div class="card-body">
             <h5 class="card-title" th:text="${note.title}"></h5>
             <h6 class="card-subtitle mb-2 text-body-secondary" th:text="${note.author}"></h6>
             <a class="btn btn-primary me-1" th:href="@{/notes/read/{id}(id=${note.id})}">Read</a>
             <a class="btn btn-primary me-1" th:href="@{/notes/edit/{id}(id=${note.id})}">Edit</a>
             <a class="btn btn-danger" th:href="@{/notes/delete/{id}(id=${note.id})}">Delete</a>
+        </div>
+    </div>
+    <h2>Public notes</h2>
+    <div class="card my-3" th:each="note: ${publicNotes}">
+        <div class="card-body">
+            <h5 class="card-title" th:text="${note.title}"></h5>
+            <h6 class="card-subtitle mb-2 text-body-secondary" th:text="${note.author}"></h6>
+            <a class="btn btn-primary" th:href="@{/notes/read/{id}(id=${note.id})}">Read</a>
         </div>
     </div>
 </main>

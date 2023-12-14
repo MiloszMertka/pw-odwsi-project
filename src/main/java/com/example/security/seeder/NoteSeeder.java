@@ -44,7 +44,8 @@ class NoteSeeder implements Seeder {
         final var title = faker.lorem().sentence();
         final var content = faker.lorem().paragraph();
         final var author = findRandomUser();
-        return new Note(title, content, author);
+        final var isPublic = faker.bool().bool();
+        return new Note(title, content, author, isPublic);
     }
 
     private User findRandomUser() {

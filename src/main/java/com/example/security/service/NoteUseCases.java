@@ -12,7 +12,11 @@ public interface NoteUseCases {
 
     List<NoteDto> getAllUserNotes(User user);
 
-    NoteDto getNote(UUID id, User user);
+    List<NoteDto> getAllPublicNotes(User user);
+
+    NoteDto getNoteToRead(UUID id, User user);
+
+    NoteDto getNoteToEdit(UUID id, User user);
 
     void createNote(CreateNoteDto createNoteDto, User user);
 

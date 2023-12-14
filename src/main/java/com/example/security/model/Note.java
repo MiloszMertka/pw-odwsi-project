@@ -26,16 +26,22 @@ public class Note {
     @ToString.Exclude
     private String content;
 
+    @Column(nullable = false)
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    private Boolean isPublic;
+
     @ManyToOne(optional = false)
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     @Setter(AccessLevel.NONE)
     private User author;
 
-    public Note(@NonNull String title, @NonNull String content, @NonNull User author) {
+    public Note(@NonNull String title, @NonNull String content, @NonNull User author, @NonNull Boolean isPublic) {
         this.title = title;
         this.content = content;
         this.author = author;
+        this.isPublic = isPublic;
     }
 
 }
