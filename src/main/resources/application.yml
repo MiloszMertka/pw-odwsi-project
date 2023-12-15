@@ -1,5 +1,11 @@
 server:
-  port: 80
+  port: 443
+  ssl:
+    key-store: classpath:keystore/app.p12
+    key-store-password: pYDuYjnGMdCF3seAEJrN
+    key-store-type: pkcs12
+    key-alias: app
+    key-password: pYDuYjnGMdCF3seAEJrN
   error:
     whitelabel:
       enabled: false

@@ -29,6 +29,8 @@ class SecurityConfig {
                                 .xssProtection(xssProtectionConfig -> xssProtectionConfig.headerValue(HeaderValue.ENABLED_MODE_BLOCK))
 //                        .contentSecurityPolicy(Customizer.withDefaults())
                 )
+                .requiresChannel(requiresChannel -> requiresChannel
+                        .anyRequest().requiresSecure())
                 .authenticationProvider(authenticationProvider())
                 .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
                         .requestMatchers("/css/**").permitAll()
