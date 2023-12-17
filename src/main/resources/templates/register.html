@@ -39,6 +39,12 @@
             <div class="invalid-feedback" th:if="${#fields.hasErrors('passwordConfirmation')}"
                  th:text="${#fields.errors('passwordConfirmation').getFirst()}"></div>
         </div>
+        <div class="col-12">
+            <p class="form-label">Password Strength</p>
+            <div class="progress my-2" role="progressbar">
+                <div class="progress-bar" id="entropy-progress-bar" style="width: 0"></div>
+            </div>
+        </div>
         <div class="col-12 d-flex justify-content-end">
             <a class="btn btn-secondary me-1" th:href="@{/users/login}">Login</a>
             <button class="btn btn-primary" type="submit">Register</button>
@@ -47,5 +53,6 @@
     </form>
 </main>
 <script th:src="@{/js/bootstrap.bundle.min.js}" type="text/javascript"></script>
+<script th:src="@{/js/password-entropy.js}" type="text/javascript"></script>
 </body>
 </html>

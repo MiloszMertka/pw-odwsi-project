@@ -24,8 +24,11 @@ class UserService implements UserUseCases, UserDetailsService {
     private static final String INVALID_CREDENTIALS_MESSAGE = "Invalid credentials";
     private static final String USER_ALREADY_EXISTS_MESSAGE = "User already exists";
     private static final String PASSWORDS_DO_NOT_MATCH_MESSAGE = "Passwords do not match";
+    private static final String PASSWORD_TOO_WEAK_MESSAGE = "Password is too weak";
+    private static final int MINIMUM_PASSWORD_ENTROPY = 70;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final PasswordEntropyCalculatorService passwordEntropyCalculatorService;
 
     @Override
     @Transactional(readOnly = true)
@@ -62,6 +65,10 @@ class UserService implements UserUseCases, UserDetailsService {
     private void validatePassword(String password, String passwordConfirmation) {
         if (!password.equals(passwordConfirmation)) {
             throw new IllegalStateException(PASSWORDS_DO_NOT_MATCH_MESSAGE);
+        }
+
+        if (passwordEntropyCalculatorService.calculatePasswordEntropy(password) < MINIMUM_PASSWORD_ENTROPY) {
+            throw new IllegalStateException(PASSWORD_TOO_WEAK_MESSAGE);
         }
     }
 
