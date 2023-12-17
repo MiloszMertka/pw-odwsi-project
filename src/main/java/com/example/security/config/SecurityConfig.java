@@ -18,6 +18,7 @@ import static org.springframework.security.web.header.writers.XXssProtectionHead
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 class SecurityConfig {
 
+    private static final long LOGIN_DELAY = 1000L;
     private final PasswordEncoder passwordEncoder;
     private final UserDetailsService userDetailsService;
 
@@ -57,6 +58,13 @@ class SecurityConfig {
         final var authenticationProvider = new DaoAuthenticationProvider();
         authenticationProvider.setPasswordEncoder(passwordEncoder);
         authenticationProvider.setUserDetailsService(userDetailsService);
+        authenticationProvider.setPreAuthenticationChecks(toCheck -> {
+            try {
+                Thread.sleep(LOGIN_DELAY);
+            } catch (InterruptedException exception) {
+                throw new RuntimeException(exception);
+            }
+        });
         return authenticationProvider;
     }
 
