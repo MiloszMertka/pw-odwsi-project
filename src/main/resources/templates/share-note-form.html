@@ -1,22 +1,8 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8"/>
-    <meta content="width=device-width, initial-scale=1" name="viewport"/>
-    <title>Notes Secure App | Share Note</title>
-    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" type="text/css"/>
-    <link rel="stylesheet" th:href="@{/css/quill.snow.css}" type="text/css"/>
-</head>
+<head th:replace="fragments/layout.html :: head(title='Share Note')"></head>
 <body>
-<nav class="navbar bg-body-tertiary">
-    <div class="container">
-        <a class="navbar-brand" th:href="@{/notes}">Notes Secure App</a>
-        <form action="#" method="post" th:action="@{/users/logout}">
-            <input th:name="${_csrf.parameterName}" th:value="${_csrf.token}" type="hidden"/>
-            <button class="btn btn-secondary" type="submit">Logout</button>
-        </form>
-    </div>
-</nav>
+<nav th:replace="fragments/layout.html :: nav"></nav>
 <main class="container mt-5">
     <h1 class="mb-4">Share Note</h1>
     <form action="#" class="row g-3" id="resource-form" method="post" th:action="@{/notes/share/{id}(id=${noteId})}"
@@ -39,8 +25,7 @@
         <div class="alert alert-danger" role="alert" th:if="${error}" th:text="${error}"></div>
     </form>
 </main>
-<script th:src="@{/js/bootstrap.bundle.min.js}" type="text/javascript"></script>
-<script th:src="@{/js/quill.min.js}" type="text/javascript"></script>
-<script th:src="@{/js/app.js}" type="text/javascript"></script>
+<th:block th:replace="fragments/layout.html :: scripts"></th:block>
+<script th:src="@{/js/note-editor.js}" type="text/javascript"></script>
 </body>
 </html>
