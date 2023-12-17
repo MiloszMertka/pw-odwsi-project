@@ -1,6 +1,7 @@
 package com.example.security.controller;
 
 import com.example.security.dto.CreateNoteDto;
+import com.example.security.dto.GetNoteDto;
 import com.example.security.dto.ShareNoteDto;
 import com.example.security.dto.UpdateNoteDto;
 import com.example.security.model.User;
@@ -36,6 +37,7 @@ class NoteController {
         model.addAttribute("userNotes", userNotes);
         model.addAttribute("sharedNotes", sharedNotes);
         model.addAttribute("publicNotes", publicNotes);
+        model.addAttribute("getNoteDto", new GetNoteDto(null));
         return "notes";
     }
 
@@ -46,9 +48,20 @@ class NoteController {
         return "note";
     }
 
+    @PostMapping("/read/{id}")
+    String showDecryptedNotePage(@PathVariable UUID id, Model model, @AuthenticationPrincipal User user, @Valid GetNoteDto getNoteDto, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return "notes";
+        }
+
+        final var note = noteUseCases.getNoteToRead(id, user, getNoteDto);
+        model.addAttribute("note", note);
+        return "note";
+    }
+
     @GetMapping("/create")
     String showCreateNoteForm(Model model) {
-        model.addAttribute("createNoteDto", new CreateNoteDto("", "", false));
+        model.addAttribute("createNoteDto", new CreateNoteDto("", "", null, false));
         return "create-note-form";
     }
 
@@ -71,12 +84,24 @@ class NoteController {
     @GetMapping("/edit/{id}")
     String showEditNoteForm(@PathVariable UUID id, Model model, @AuthenticationPrincipal User user) {
         final var note = noteUseCases.getNoteToEdit(id, user);
-        model.addAttribute("updateNoteDto", new UpdateNoteDto(note.title(), note.content(), note.isPublic()));
+        model.addAttribute("updateNoteDto", new UpdateNoteDto(note.title(), note.content(), null, note.isPublic()));
         model.addAttribute("noteId", id);
         return "edit-note-form";
     }
 
     @PostMapping("/edit/{id}")
+    String showEditDecryptedNoteForm(@PathVariable UUID id, Model model, @AuthenticationPrincipal User user, @Valid GetNoteDto getNoteDto, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return "notes";
+        }
+
+        final var note = noteUseCases.getNoteToEdit(id, user, getNoteDto);
+        model.addAttribute("updateNoteDto", new UpdateNoteDto(note.title(), note.content(), null, note.isPublic()));
+        model.addAttribute("noteId", id);
+        return "edit-note-form";
+    }
+
+    @PostMapping("/update/{id}")
     String updateNote(@PathVariable UUID id, @Valid UpdateNoteDto updateNoteDto, BindingResult bindingResult, @AuthenticationPrincipal User user, Model model) {
         if (bindingResult.hasErrors()) {
             return "edit-note-form";

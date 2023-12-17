@@ -31,6 +31,11 @@ public class Note {
     @Column(nullable = false)
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
+    private Boolean isEncrypted;
+
+    @Column(nullable = false)
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private Boolean isPublic;
 
     @ManyToOne(optional = false)
@@ -39,17 +44,18 @@ public class Note {
     @Setter(AccessLevel.NONE)
     private User author;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     @Setter(AccessLevel.NONE)
     private Set<User> readers = new HashSet<>();
 
-    public Note(@NonNull String title, @NonNull String content, @NonNull User author, @NonNull Boolean isPublic) {
+    public Note(@NonNull String title, @NonNull String content, @NonNull User author, @NonNull Boolean isPublic, @NonNull Boolean isEncrypted) {
         this.title = title;
         this.content = content;
         this.author = author;
         this.isPublic = isPublic;
+        this.isEncrypted = isEncrypted;
     }
 
 }

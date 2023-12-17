@@ -7,6 +7,7 @@ public record NoteDto(
         UUID id,
         String title,
         String content,
+        Boolean isEncrypted,
         Boolean isPublic,
         String author,
         Set<String> readers

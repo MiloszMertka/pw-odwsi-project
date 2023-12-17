@@ -19,7 +19,7 @@
 </nav>
 <main class="container mt-5">
     <h1 class="mb-4">Edit Note</h1>
-    <form action="#" class="row g-3" id="resource-form" method="post" th:action="@{/notes/edit/{id}(id=${noteId})}"
+    <form action="#" class="row g-3" id="resource-form" method="post" th:action="@{/notes/update/{id}(id=${noteId})}"
           th:object="${updateNoteDto}">
         <input th:name="${_csrf.parameterName}" th:value="${_csrf.token}" type="hidden"/>
         <div class="col-12">
@@ -36,6 +36,18 @@
         <div id="editor"></div>
         <div class="invalid-feedback" th:if="${#fields.hasErrors('content')}"
              th:text="${#fields.errors('content').getFirst()}"></div>
+        <div class="col-12">
+            <label class="form-label" for="password">Password</label>
+            <input class="form-control" id="password" name="password"
+                   th:classappend="${#fields.hasErrors('password') ? 'is-invalid' : ''}"
+                   th:field="*{password}"
+                   type="password"/>
+            <div class="invalid-feedback" th:if="${#fields.hasErrors('password')}"
+                 th:text="${#fields.errors('password').getFirst()}"></div>
+            <div class="form-text">
+                This field is optional. If you set a password, you will need to provide it to view the note.
+            </div>
+        </div>
         <div class="col-12 form-check">
             <input class="form-check-input" id="isPublic" name="isPublic" th:field="*{isPublic}" type="checkbox"/>
             <label class="form-check-label" for="isPublic">
