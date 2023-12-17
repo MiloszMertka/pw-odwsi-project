@@ -26,8 +26,9 @@ class SecurityConfig {
         return httpSecurity
                 .csrf(Customizer.withDefaults())
                 .headers(headers -> headers
-                                .xssProtection(xssProtectionConfig -> xssProtectionConfig.headerValue(HeaderValue.ENABLED_MODE_BLOCK))
-//                        .contentSecurityPolicy(Customizer.withDefaults())
+                        .xssProtection(xssProtectionConfig -> xssProtectionConfig.headerValue(HeaderValue.ENABLED_MODE_BLOCK))
+                        .contentSecurityPolicy(contentSecurityPolicyConfig -> contentSecurityPolicyConfig
+                                .policyDirectives("default-src 'self'; img-src *; object-src 'none'; upgrade-insecure-requests; require-trusted-types-for 'script';"))
                 )
                 .requiresChannel(requiresChannel -> requiresChannel
                         .anyRequest().requiresSecure())
