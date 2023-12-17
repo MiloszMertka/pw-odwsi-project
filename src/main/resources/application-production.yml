@@ -1,5 +1,9 @@
 spring:
   devtools:
     add-properties: false
+  datasource:
+    url: jdbc:postgresql://postgres:5432/security
+    username: security
+    password: JhCMLmaQubn6KjDVxN2dcFyreRvEXg
 seeders:
-  enabled: false
+  enabled: true
