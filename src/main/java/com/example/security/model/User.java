@@ -2,6 +2,7 @@ package com.example.security.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.jboss.aerogear.security.otp.api.Base32;
 import org.springframework.lang.NonNull;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -37,10 +38,17 @@ public class User implements UserDetails {
     @ToString.Exclude
     private String password;
 
+    @Column(nullable = false)
+    @Setter(AccessLevel.NONE)
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    private String totpSecret;
+
     public User(@NonNull String username, @NonNull String email, @NonNull String password) {
         this.username = username;
         this.email = email;
         this.password = password;
+        this.totpSecret = Base32.random();
     }
 
     @Override

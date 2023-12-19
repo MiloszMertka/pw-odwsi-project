@@ -1,12 +1,15 @@
 package com.example.security.config;
 
 import com.example.security.dto.LastSuccessfulLoginDto;
+import com.example.security.repository.UserRepository;
 import com.github.benmanes.caffeine.cache.Cache;
 import jakarta.annotation.PostConstruct;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jboss.aerogear.security.otp.Totp;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -27,6 +30,7 @@ import java.util.Objects;
 class EnhancedDaoAuthenticationProvider extends DaoAuthenticationProvider {
 
     private static final String REACHED_MAX_UNSUCCESSFUL_LOGIN_ATTEMPTS = "Reached max unsuccessful login attempts";
+    private static final String INVALID_CREDENTIALS = "Invalid credentials";
     private static final long LOGIN_DELAY = 1000L;
     private static final int MAX_UNSUCCESSFUL_LOGIN_ATTEMPTS = 5;
     private static final int MAX_LAST_SUCCESSFUL_LOGINS = 5;
@@ -34,6 +38,7 @@ class EnhancedDaoAuthenticationProvider extends DaoAuthenticationProvider {
     private final UserDetailsService userDetailsService;
     private final Cache<String, Integer> unsuccessfulLoginAttemptsCache;
     private final Cache<UserDetails, List<LastSuccessfulLoginDto>> lastSuccessfulLoginsCache;
+    private final UserRepository userRepository;
 
     @PostConstruct
     private void init() {
@@ -55,6 +60,12 @@ class EnhancedDaoAuthenticationProvider extends DaoAuthenticationProvider {
     }
 
     @Override
+    protected void additionalAuthenticationChecks(UserDetails userDetails, UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
+        super.additionalAuthenticationChecks(userDetails, authentication);
+        validateVerificationCode(authentication);
+    }
+
+    @Override
     protected Authentication createSuccessAuthentication(Object principal, Authentication authentication, UserDetails user) {
         clearUnsuccessfulLoginAttempts();
         addLastSuccessfulLogin(user);
@@ -67,6 +78,27 @@ class EnhancedDaoAuthenticationProvider extends DaoAuthenticationProvider {
         } catch (InterruptedException exception) {
             throw new RuntimeException(exception);
         }
+    }
+
+    private void validateVerificationCode(Authentication authentication) {
+        final var verificationCode = ((TotpAuthenticationDetails) authentication.getDetails()).getVerificationCode();
+        final var user = userRepository.findByUsername(authentication.getName())
+                .orElseThrow(() -> new BadCredentialsException(INVALID_CREDENTIALS));
+        final var totp = new Totp(user.getTotpSecret());
+
+        if (!isVerificationCodeValidLongNumber(verificationCode) || !totp.verify(verificationCode)) {
+            throw new BadCredentialsException(INVALID_CREDENTIALS);
+        }
+    }
+
+    private boolean isVerificationCodeValidLongNumber(String verificationCode) {
+        try {
+            Long.parseLong(verificationCode);
+        } catch (NumberFormatException exception) {
+            return false;
+        }
+
+        return true;
     }
 
     private void checkIfReachedMaxUnsuccessfulLoginAttempts() {

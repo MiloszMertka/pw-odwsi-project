@@ -17,6 +17,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Service
@@ -30,6 +32,8 @@ class UserService implements UserUseCases, UserDetailsService {
     private static final String USER_EMAIL_NOT_FOUND_MESSAGE = "User with given email not found";
     private static final String INVALID_TOKEN_MESSAGE = "Invalid token";
     private static final int MINIMUM_PASSWORD_ENTROPY = 70;
+    public static String QR_PREFIX =
+            "https://chart.googleapis.com/chart?chs=200x200&chld=M%%7C0&cht=qr&chl=";
     private final UserRepository userRepository;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
     private final PasswordEncoder passwordEncoder;
@@ -46,12 +50,14 @@ class UserService implements UserUseCases, UserDetailsService {
 
     @Override
     @Transactional
-    public void registerUser(@NonNull RegisterUserDto registerUserDto) {
+    public String registerUser(@NonNull RegisterUserDto registerUserDto) {
         validateUserDoesNotExist(registerUserDto.username(), registerUserDto.email());
         validatePassword(registerUserDto.password(), registerUserDto.passwordConfirmation());
         final var encodedPassword = passwordEncoder.encode(registerUserDto.password());
         final var user = new User(registerUserDto.username(), registerUserDto.email(), encodedPassword);
+        final var qrUrl = generateQRUrl(user);
         userRepository.save(user);
+        return qrUrl;
     }
 
     @Override
@@ -109,6 +115,13 @@ class UserService implements UserUseCases, UserDetailsService {
         final var user = passwordResetToken.getUser();
         user.setPassword(encodedPassword);
         userRepository.save(user);
+    }
+
+    private String generateQRUrl(User user) {
+        return QR_PREFIX + URLEncoder.encode(String.format(
+                        "otpauth://totp/%s:%s?secret=%s&issuer=%s",
+                        "security", user.getEmail(), user.getTotpSecret(), "security"),
+                StandardCharsets.UTF_8);
     }
 
     private void validateUserDoesNotExist(String username, String email) {

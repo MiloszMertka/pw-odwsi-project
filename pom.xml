@@ -19,6 +19,7 @@
         <faker.version>1.0.2</faker.version>
         <owasp.html.sanitizer.version>20220608.1</owasp.html.sanitizer.version>
         <caffeine.version>3.1.8</caffeine.version>
+        <aerogear.otp.version>1.0.0</aerogear.otp.version>
     </properties>
     <dependencies>
         <dependency>
@@ -68,6 +69,11 @@
             <groupId>com.github.ben-manes.caffeine</groupId>
             <artifactId>caffeine</artifactId>
             <version>${caffeine.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.aerogear</groupId>
+            <artifactId>aerogear-otp-java</artifactId>
+            <version>${aerogear.otp.version}</version>
         </dependency>
 
         <dependency>

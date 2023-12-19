@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface UserUseCases {
 
-    void registerUser(RegisterUserDto registerUserDto);
+    String registerUser(RegisterUserDto registerUserDto);
 
     List<UserDto> getAllOtherUsers(User user);
 

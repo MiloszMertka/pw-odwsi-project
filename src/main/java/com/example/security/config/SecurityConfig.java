@@ -15,6 +15,7 @@ import static org.springframework.security.web.header.writers.XXssProtectionHead
 class SecurityConfig {
 
     private final EnhancedDaoAuthenticationProvider authenticationProvider;
+    private final TotpAuthenticationDetailsSource authenticationDetailsSource;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
@@ -37,6 +38,7 @@ class SecurityConfig {
                         .requestMatchers("/users/change-password").permitAll()
                         .anyRequest().authenticated())
                 .formLogin(formLogin -> formLogin
+                        .authenticationDetailsSource(authenticationDetailsSource)
                         .loginPage("/users/login")
                         .loginProcessingUrl("/users/login")
                         .defaultSuccessUrl("/notes", true)

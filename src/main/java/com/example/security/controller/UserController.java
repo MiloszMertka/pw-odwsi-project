@@ -27,7 +27,7 @@ class UserController {
 
     @GetMapping("/login")
     String showLoginForm(Model model) {
-        model.addAttribute("loginUserDto", new LoginUserDto("", ""));
+        model.addAttribute("loginUserDto", new LoginUserDto("", "", ""));
         return "login";
     }
 
@@ -44,13 +44,13 @@ class UserController {
         }
 
         try {
-            userUseCases.registerUser(registerUserDto);
+            final var qr = userUseCases.registerUser(registerUserDto);
+            model.addAttribute("qr", qr);
+            return "qr-code";
         } catch (IllegalStateException exception) {
             model.addAttribute("error", exception.getMessage());
             return "register";
         }
-
-        return "redirect:/users/login";
     }
 
     @GetMapping("/last-successful-logins")

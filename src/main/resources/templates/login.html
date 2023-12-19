@@ -25,6 +25,16 @@
                 Invalid credentials
             </div>
         </div>
+        <div class="col-12">
+            <label class="form-label" for="verificationCode">Verification Code</label>
+            <input class="form-control" id="verificationCode" name="verificationCode"
+                   th:classappend="${param.error != null ? 'is-invalid' : ''}" th:field="*{verificationCode}"
+                   type="text"/>
+            <div class="invalid-feedback" th:if="${param.error != null}">
+                Invalid credentials
+            </div>
+            <div class="form-text">Use Google Authenticator app on your phone</div>
+        </div>
         <div class="col-12 d-flex justify-content-end">
             <a class="btn btn-secondary me-1" th:href="@{/users/password-reset}">Reset Password</a>
             <a class="btn btn-secondary me-1" th:href="@{/users/register}">Register</a>
