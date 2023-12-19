@@ -1,5 +1,6 @@
 package com.example.security.config;
 
+import com.example.security.dto.LastSuccessfulLoginDto;
 import com.github.benmanes.caffeine.cache.Cache;
 import jakarta.annotation.PostConstruct;
 import lombok.AccessLevel;
@@ -16,6 +17,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
 
 @Component
@@ -26,9 +29,11 @@ class EnhancedDaoAuthenticationProvider extends DaoAuthenticationProvider {
     private static final String REACHED_MAX_UNSUCCESSFUL_LOGIN_ATTEMPTS = "Reached max unsuccessful login attempts";
     private static final long LOGIN_DELAY = 1000L;
     private static final int MAX_UNSUCCESSFUL_LOGIN_ATTEMPTS = 5;
+    private static final int MAX_LAST_SUCCESSFUL_LOGINS = 5;
     private final PasswordEncoder passwordEncoder;
     private final UserDetailsService userDetailsService;
     private final Cache<String, Integer> unsuccessfulLoginAttemptsCache;
+    private final Cache<UserDetails, List<LastSuccessfulLoginDto>> lastSuccessfulLoginsCache;
 
     @PostConstruct
     private void init() {
@@ -52,6 +57,7 @@ class EnhancedDaoAuthenticationProvider extends DaoAuthenticationProvider {
     @Override
     protected Authentication createSuccessAuthentication(Object principal, Authentication authentication, UserDetails user) {
         clearUnsuccessfulLoginAttempts();
+        addLastSuccessfulLogin(user);
         return super.createSuccessAuthentication(principal, authentication, user);
     }
 
@@ -91,6 +97,19 @@ class EnhancedDaoAuthenticationProvider extends DaoAuthenticationProvider {
         final var request = ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes())).getRequest();
         final var ipAddress = request.getRemoteAddr();
         return unsuccessfulLoginAttemptsCache.get(ipAddress, key -> 0);
+    }
+
+    private void addLastSuccessfulLogin(UserDetails user) {
+        final var request = ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes())).getRequest();
+        final var lastSuccessfulLogins = lastSuccessfulLoginsCache.get(user, key -> new LinkedList<>());
+        final var lastSuccessfulLogin = new LastSuccessfulLoginDto(request.getRemoteAddr(), request.getHeader("User-Agent"));
+        lastSuccessfulLogins.add(lastSuccessfulLogin);
+
+        while (lastSuccessfulLogins.size() > MAX_LAST_SUCCESSFUL_LOGINS) {
+            lastSuccessfulLogins.removeFirst();
+        }
+
+        lastSuccessfulLoginsCache.put(user, lastSuccessfulLogins);
     }
 
 }

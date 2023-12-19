@@ -2,10 +2,12 @@ package com.example.security.controller;
 
 import com.example.security.dto.LoginUserDto;
 import com.example.security.dto.RegisterUserDto;
+import com.example.security.model.User;
 import com.example.security.service.UserUseCases;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -46,6 +48,12 @@ class UserController {
         }
 
         return "redirect:/users/login";
+    }
+
+    @GetMapping("/last-successful-logins")
+    String showLastSuccessfulLoginsPage(Model model, @AuthenticationPrincipal User user) {
+        model.addAttribute("lastSuccessfulLogins", userUseCases.getLastSuccessfulLogins(user));
+        return "last-successful-logins";
     }
 
 }

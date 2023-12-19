@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/layout.html :: head(title='Last Successful Logins')"></head>
+<body>
+<nav th:replace="fragments/layout.html :: nav"></nav>
+<main class="container mt-5">
+    <h1 class="mb-4">Last Successful Logins</h1>
+    <div>
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">IP</th>
+                <th scope="col">User Agent</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="lastSuccessfulLogin: ${lastSuccessfulLogins}">
+                <td th:text="${lastSuccessfulLogin.ipAddress}"></td>
+                <td th:text="${lastSuccessfulLogin.userAgent}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <a class="btn btn-secondary mt-4" th:href="@{/notes}">Return</a>
+</main>
+<th:block th:replace="fragments/layout.html :: scripts"></th:block>
+</body>
+</html>

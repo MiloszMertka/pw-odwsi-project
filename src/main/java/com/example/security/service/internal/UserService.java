@@ -1,10 +1,12 @@
 package com.example.security.service.internal;
 
+import com.example.security.dto.LastSuccessfulLoginDto;
 import com.example.security.dto.RegisterUserDto;
 import com.example.security.dto.UserDto;
 import com.example.security.model.User;
 import com.example.security.repository.UserRepository;
 import com.example.security.service.UserUseCases;
+import com.github.benmanes.caffeine.cache.Cache;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +31,7 @@ class UserService implements UserUseCases, UserDetailsService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final PasswordEntropyCalculatorService passwordEntropyCalculatorService;
+    private final Cache<UserDetails, List<LastSuccessfulLoginDto>> lastSuccessfulLoginsCache;
 
     @Override
     @Transactional(readOnly = true)
@@ -54,6 +57,11 @@ class UserService implements UserUseCases, UserDetailsService {
                 .filter(otherUser -> !otherUser.equals(user))
                 .map(this::mapUserToUserDto)
                 .toList();
+    }
+
+    @Override
+    public List<LastSuccessfulLoginDto> getLastSuccessfulLogins(@NonNull User user) {
+        return lastSuccessfulLoginsCache.get(user, key -> List.of()).reversed();
     }
 
     private void validateUserDoesNotExist(String username) {
