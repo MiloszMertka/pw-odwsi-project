@@ -1,8 +1,6 @@
 package com.example.security.service;
 
-import com.example.security.dto.LastSuccessfulLoginDto;
-import com.example.security.dto.RegisterUserDto;
-import com.example.security.dto.UserDto;
+import com.example.security.dto.*;
 import com.example.security.model.User;
 
 import java.util.List;
@@ -14,5 +12,11 @@ public interface UserUseCases {
     List<UserDto> getAllOtherUsers(User user);
 
     List<LastSuccessfulLoginDto> getLastSuccessfulLogins(User user);
+
+    void createPasswordResetToken(CreatePasswordResetTokenDto createPasswordResetTokenDto);
+
+    boolean isPasswordResetTokenValid(String token);
+
+    void changePassword(ChangePasswordDto changePasswordDto);
 
 }

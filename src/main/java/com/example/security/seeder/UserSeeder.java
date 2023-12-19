@@ -42,8 +42,9 @@ class UserSeeder implements Seeder {
 
     private User createUser() {
         final var username = faker.name().username();
+        final var email = faker.internet().emailAddress(username);
         final var encodedPassword = passwordEncoder.encode(FAKE_PASSWORD);
-        return new User(username, encodedPassword);
+        return new User(username, email, encodedPassword);
     }
 
 }

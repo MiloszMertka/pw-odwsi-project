@@ -33,6 +33,8 @@ class SecurityConfig {
                         .requestMatchers("/js/**").permitAll()
                         .requestMatchers("/users/login").permitAll()
                         .requestMatchers("/users/register").permitAll()
+                        .requestMatchers("/users/password-reset").permitAll()
+                        .requestMatchers("/users/change-password").permitAll()
                         .anyRequest().authenticated())
                 .formLogin(formLogin -> formLogin
                         .loginPage("/users/login")

@@ -27,14 +27,19 @@ public class User implements UserDetails {
     @Setter(AccessLevel.NONE)
     private String username;
 
+    @Column(unique = true, nullable = false)
+    @Setter(AccessLevel.NONE)
+    private String email;
+
     @Column(nullable = false)
     @Getter(AccessLevel.NONE)
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     private String password;
 
-    public User(@NonNull String username, @NonNull String password) {
+    public User(@NonNull String username, @NonNull String email, @NonNull String password) {
         this.username = username;
+        this.email = email;
         this.password = password;
     }
 

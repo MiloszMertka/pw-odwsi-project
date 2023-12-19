@@ -21,5 +21,16 @@ spring:
     url: jdbc:postgresql://localhost:5432/security
     username: security
     password: JhCMLmaQubn6KjDVxN2dcFyreRvEXg
+  mail:
+    host: sandbox.smtp.mailtrap.io
+    port: 587
+    username: 8f3368a90cd43d
+    password: 1e377102580a85
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 seeders:
   enabled: true

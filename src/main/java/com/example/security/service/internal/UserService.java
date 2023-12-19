@@ -1,9 +1,9 @@
 package com.example.security.service.internal;
 
-import com.example.security.dto.LastSuccessfulLoginDto;
-import com.example.security.dto.RegisterUserDto;
-import com.example.security.dto.UserDto;
+import com.example.security.dto.*;
+import com.example.security.model.PasswordResetToken;
 import com.example.security.model.User;
+import com.example.security.repository.PasswordResetTokenRepository;
 import com.example.security.repository.UserRepository;
 import com.example.security.service.UserUseCases;
 import com.github.benmanes.caffeine.cache.Cache;
@@ -27,10 +27,14 @@ class UserService implements UserUseCases, UserDetailsService {
     private static final String USER_ALREADY_EXISTS_MESSAGE = "User already exists";
     private static final String PASSWORDS_DO_NOT_MATCH_MESSAGE = "Passwords do not match";
     private static final String PASSWORD_TOO_WEAK_MESSAGE = "Password is too weak";
+    private static final String USER_EMAIL_NOT_FOUND_MESSAGE = "User with given email not found";
+    private static final String INVALID_TOKEN_MESSAGE = "Invalid token";
     private static final int MINIMUM_PASSWORD_ENTROPY = 70;
     private final UserRepository userRepository;
+    private final PasswordResetTokenRepository passwordResetTokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final PasswordEntropyCalculatorService passwordEntropyCalculatorService;
+    private final PasswordResetEmailService passwordResetEmailService;
     private final Cache<UserDetails, List<LastSuccessfulLoginDto>> lastSuccessfulLoginsCache;
 
     @Override
@@ -43,10 +47,10 @@ class UserService implements UserUseCases, UserDetailsService {
     @Override
     @Transactional
     public void registerUser(@NonNull RegisterUserDto registerUserDto) {
-        validateUserDoesNotExist(registerUserDto.username());
+        validateUserDoesNotExist(registerUserDto.username(), registerUserDto.email());
         validatePassword(registerUserDto.password(), registerUserDto.passwordConfirmation());
         final var encodedPassword = passwordEncoder.encode(registerUserDto.password());
-        final var user = new User(registerUserDto.username(), encodedPassword);
+        final var user = new User(registerUserDto.username(), registerUserDto.email(), encodedPassword);
         userRepository.save(user);
     }
 
@@ -64,8 +68,51 @@ class UserService implements UserUseCases, UserDetailsService {
         return lastSuccessfulLoginsCache.get(user, key -> List.of()).reversed();
     }
 
-    private void validateUserDoesNotExist(String username) {
-        if (userRepository.existsByUsername(username)) {
+    @Override
+    @Transactional
+    public void createPasswordResetToken(@NonNull CreatePasswordResetTokenDto createPasswordResetTokenDto) {
+        final var user = userRepository.findByEmail(createPasswordResetTokenDto.email())
+                .orElseThrow(() -> new IllegalStateException(USER_EMAIL_NOT_FOUND_MESSAGE));
+        final var token = new PasswordResetToken(user);
+        passwordResetEmailService.sendPasswordResetEmail(user, token);
+        passwordResetTokenRepository.save(token);
+    }
+
+    @Override
+    @Transactional
+    public boolean isPasswordResetTokenValid(String token) {
+        if (token == null) {
+            return false;
+        }
+
+        final var passwordResetToken = passwordResetTokenRepository.findByToken(token);
+
+        if (passwordResetToken.isEmpty()) {
+            return false;
+        }
+
+        if (passwordResetToken.get().isExpired()) {
+            passwordResetTokenRepository.delete(passwordResetToken.get());
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    @Transactional
+    public void changePassword(@NonNull ChangePasswordDto changePasswordDto) {
+        final var passwordResetToken = passwordResetTokenRepository.findByToken(changePasswordDto.token())
+                .orElseThrow(() -> new IllegalStateException(INVALID_TOKEN_MESSAGE));
+        validatePassword(changePasswordDto.password(), changePasswordDto.passwordConfirmation());
+        final var encodedPassword = passwordEncoder.encode(changePasswordDto.password());
+        final var user = passwordResetToken.getUser();
+        user.setPassword(encodedPassword);
+        userRepository.save(user);
+    }
+
+    private void validateUserDoesNotExist(String username, String email) {
+        if (userRepository.existsByUsername(username) || userRepository.existsByEmail(email)) {
             throw new IllegalStateException(USER_ALREADY_EXISTS_MESSAGE);
         }
     }
