@@ -24,7 +24,7 @@ class SecurityConfig {
                 .headers(headers -> headers
                         .xssProtection(xssProtectionConfig -> xssProtectionConfig.headerValue(HeaderValue.ENABLED_MODE_BLOCK))
                         .contentSecurityPolicy(contentSecurityPolicyConfig -> contentSecurityPolicyConfig
-                                .policyDirectives("default-src 'self'; img-src * data:; object-src 'none'; upgrade-insecure-requests; require-trusted-types-for 'script';"))
+                                .policyDirectives("default-src 'self'; img-src * data:; object-src 'none'; upgrade-insecure-requests;"))
                 )
                 .requiresChannel(requiresChannel -> requiresChannel
                         .anyRequest().requiresSecure())
